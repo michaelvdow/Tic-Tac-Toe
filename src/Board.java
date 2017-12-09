@@ -7,6 +7,10 @@ public class Board {
 		
 	}
 	
+	public int[][] getBoard(){
+		return board;
+	}
+	
 	public boolean makeMove(int player, int x, int y) {
 		if(board[x][y] == 0) {
 			board[x][y] = player;

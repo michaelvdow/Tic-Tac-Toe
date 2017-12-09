@@ -20,14 +20,17 @@ public class Driver {
 	static JPanel boardPanel = new JPanel();
 	static Board board = new Board();
 	static JButton[][] buttons = new JButton[3][3];
+	static JButton clear = new JButton("Clear");
 	
 	static int player = 1;
 	static boolean started = false;
+	static AI ai = new AI();
+	static boolean ended = false;
 	
 	public static void main(String[] args) {
 		
 		frame.setSize(500, 625);
-		frame.setDefaultCloseOperation (JFrame.EXIT_ON_CLOSE);
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		panel.setSize(500, 600);
 		topPanel.setPreferredSize(new Dimension(500, 100));
@@ -45,18 +48,38 @@ public class Driver {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				if(!started) {
-					//Get move from AI	
+					int[] point = ai.getMove(board);
+					board.makeMove(2, point[0], point[1]);
+					buttons[point[0]][point[1]].setText("O");
+					player = 1;
 				}
 				
 				started = true;				
 			}
 		});
 		
+		clear.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				started = false;
+				board = new Board();
+				ended = false;
+				for(int i = 0; i < buttons.length; i++) {
+					for(int j = 0; j < buttons.length; j++) {
+						buttons[i][j].setText("");
+					}
+				}
+			}
+		});
+		
 		topPanel.add(question);
 		topPanel.add(aiButton);
+		topPanel.add(clear);
 		
 		panel.add(topPanel);
 
+		
 		
 		GridLayout layout = new GridLayout(3, 3);
 		boardPanel.setLayout(layout);
@@ -89,6 +112,7 @@ public class Driver {
 	
 	public static void buttonClicked(Object object) {
 		started = true;
+		int winner;
 		int x = 0; 
 		int y = 0;
 		for(int i = 0; i < buttons.length; i++) {
@@ -101,34 +125,51 @@ public class Driver {
 			}
 		}
 		
-		if(board.makeMove(player, x, y)) {
-			if(player == 1) {
-				player = 2;
-				buttons[x][y].setText("X");
-			} else {
-				player = 1;
-				buttons[x][y].setText("O");
+		if(!ended && !boardIsFull(board)){
+			if(board.makeMove(player, x, y)) {
+				if(player == 1) {
+					player = 2;
+					buttons[x][y].setText("X");
+				} else {
+					player = 1;
+					buttons[x][y].setText("O");
+				}
+			}
+			
+			winner = board.winner();
+			if(winner != 0) {
+				System.out.println(winner);
+				ended = true;
 			}
 		}
 		
-		int winner = board.winner();
-		if(winner != 0) {
-			System.out.println(winner);
+		if(!ended && !boardIsFull(board)) {
+			//Get move from AI
+			if(player == 2) {
+				int[] point = ai.getMove(board);
+				board.makeMove(2, point[0], point[1]);
+				buttons[point[0]][point[1]].setText("O");
+				player = 1;
+			}
+			winner = board.winner();
+			if(winner != 0) {
+				System.out.println(winner);
+				ended = true;
+			}
 		}
-		
-		//Get move from AI
-		if(player == 2) {
-			
-		}
-		
-		winner = board.winner();
-		if(winner != 0) {
-			System.out.println(winner);
-		}
-		
 		
 	}
 	
+	public static boolean boardIsFull(Board board) {
+		for(int i = 0; i < board.getBoard().length; i++) {
+			for(int j = 0; j < board.getBoard().length; j++) {
+				if(board.getBoard()[i][j] == 0) {
+					return false;
+				}
+			}
+		}
+		return true;		
+	}
 	
 
 }
