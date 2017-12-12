@@ -7,10 +7,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.BorderFactory;
+import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 
 public class Driver {
 	
@@ -21,10 +24,12 @@ public class Driver {
 	static Board board = new Board();
 	static JButton[][] buttons = new JButton[3][3];
 	static JButton clear = new JButton("Clear");
+	static JRadioButton level1 = new JRadioButton("Easy mode");
+	static JRadioButton level2 = new JRadioButton("Hard mode");
 	
 	static int player = 1;
 	static boolean started = false;
-	static AI ai = new AI();
+	static AI ai = new AI(1);
 	static boolean ended = false;
 	
 	public static void main(String[] args) {
@@ -70,12 +75,37 @@ public class Driver {
 						buttons[i][j].setText("");
 					}
 				}
+				player = 1;
 			}
 		});
+		
+		level1.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				ai = new AI(1);
+			}
+		});
+		
+		level2.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				ai = new AI(2);
+			}
+		});
+		
+		ButtonGroup group = new ButtonGroup();
+		group.add(level1);
+		group.add(level2);
+		
+		level1.setSelected(true);
 		
 		topPanel.add(question);
 		topPanel.add(aiButton);
 		topPanel.add(clear);
+		topPanel.add(level1);
+		topPanel.add(level2);
 		
 		panel.add(topPanel);
 
@@ -139,6 +169,11 @@ public class Driver {
 			winner = board.winner();
 			if(winner != 0) {
 				System.out.println(winner);
+				if(winner == 1) {
+					JOptionPane.showMessageDialog(frame, "Congrats, you beat the AI!");
+				} else {
+					JOptionPane.showMessageDialog(frame, "The AI wins, better luck next time!");
+				}
 				ended = true;
 			}
 		}
@@ -154,9 +189,15 @@ public class Driver {
 			winner = board.winner();
 			if(winner != 0) {
 				System.out.println(winner);
+				if(winner == 1) {
+					JOptionPane.showMessageDialog(frame, "Congrats, you beat the AI!");
+				} else {
+					JOptionPane.showMessageDialog(frame, "The AI wins, better luck next time!");
+				}
 				ended = true;
 			}
 		}
+		
 		
 	}
 	
